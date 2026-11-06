@@ -2,6 +2,11 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_PATH = 'C:\\Users\\Administrator\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin'
+        PATH = "${DOCKER_PATH};${env.PATH}"
+    }
+
     stages {
 
         stage('GitHub Checkout') {
@@ -15,6 +20,14 @@ pipeline {
             steps {
                 bat 'node --version'
                 bat 'npm --version'
+            }
+        }
+
+        stage('Check Docker') {
+            steps {
+                bat 'where docker'
+                bat 'docker --version'
+                bat 'docker info'
             }
         }
 
