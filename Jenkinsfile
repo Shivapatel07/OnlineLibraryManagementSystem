@@ -1,75 +1,59 @@
+
 pipeline {
     agent any
 
-    environment {
-        IMAGE_NAME = 'online-library:latest'
-        CONTAINER_NAME = 'online-library-container'
-    }
-
     stages {
-        stage('Checkout') {
+
+        stage('GitHub Checkout') {
             steps {
-                checkout scm
+                git branch: 'main',
+                    url: 'https://github.com/Shivapatel07/OnlineLibraryManagementSystem.git'
             }
         }
 
-        stage('Check Node and npm') {
+        stage('Check Node and NPM') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'node --version'
-                        sh 'npm --version'
-                    } else {
-                        bat 'node --version'
-                        bat 'npm --version'
-                    }
-                }
+                bat 'node --version'
+                bat 'npm --version'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'npm install'
-                    } else {
-                        bat 'npm install'
-                    }
-                }
+                bat 'npm install'
             }
         }
 
-        stage('Application Tests') {
+        stage('Run Tests') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'npm test'
-                    } else {
-                        bat 'npm test'
-                    }
-                }
+                bat 'npm test'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'docker build -t ${IMAGE_NAME} .'
-                    } else {
-                        bat 'docker build -t %IMAGE_NAME% .'
-                    }
-                }
+                bat 'docker build -t online-library-management-system:latest .'
+            }
+        }
+
+        stage('Verify Docker Image') {
+            steps {
+                bat 'docker images'
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully. Docker image is ready.'
+            echo 'BUILD SUCCESSFUL - Online Library Management System'
         }
+
         failure {
-            echo 'Pipeline failed. Check the stage logs.'
+            echo 'BUILD FAILED - Check Jenkins Console Output'
+        }
+
+        always {
+            echo 'Jenkins Pipeline Execution Completed'
         }
     }
 }
